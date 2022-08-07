@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -22,13 +22,17 @@ class Person(db.Model):
         return self.name
 
 
-db.create_all()
+class Todo(db.Model):
+    __tablename__ = 'todos'
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.Text, nullable=False)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
 
 
 @app.route('/')
 def index():
-    person = Person.query.first()
-    return f'Hello, {person.name}!'
+    data = ['Wash clothes', 'Eat food', 'Play games', 'Finish project']
+    return render_template('index.html', data=data)
 
 
 if __name__ == '__main__':
