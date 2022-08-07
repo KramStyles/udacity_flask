@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:*@localhost:5432/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-migrate = Migrate(app,db)
+migrate = Migrate(app, db)
 
 
 class Person(db.Model):
@@ -36,22 +36,22 @@ def index():
     data = Todo.query.all()
     return render_template('index.html', data=data)
 
+
+# Function calls
 @app.route('/todos/create', methods=['POST'])
 def todo_create():
     error = False
     msg = ''
 
     try:
-        # item = request.form.get('todo_item', '').strip()
-        item = request.json.get('todo_item', '').strip()
+        item = request.form.get('todo_item', '').strip()
+        # item = request.json.get('todo_item', '').strip()
         if not item:
             return "Empty values are not allowed"
-        
+
         item = Todo(description=item)
         db.session.add(item)
-        # db.session.commit()
-        # return redirect(url_for('index'))
-        msg = item.description
+        db.session.commit()
     except Exception as err:
         msg = str(err)
         db.session.rollback()
@@ -60,9 +60,28 @@ def todo_create():
         db.session.close()
 
     if not error:
-        return jsonify({
-            'todo_item': msg
-        })
+        return redirect(url_for('index'))
+    return msg
+
+
+@app.route('/todos/update/<data_id>', methods=['POST'])
+def todo_update(data_id):
+    state = request.form.get('current_state')
+    msg = ''
+
+    try:
+        todo = Todo.query.get(data_id)
+        todo.completed = True if state == 'true' else False
+        db.session.commit()
+
+        msg = 'ok'
+    except Exception as err:
+        db.session.rollback()
+        msg = str(err)
+    finally:
+        db.session.close()
+
+    return msg
 
 
 if __name__ == '__main__':
