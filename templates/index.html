@@ -8,18 +8,43 @@
 </head>
 <body>
 	<div class="container">
-		<form action="/todos/create" method="post" class="mt-4">
+		<form class="mt-4" id='form'>
 			<div class="form-group">
-				<input class="form-control mb-2" placeholder="Add new Todos" name="todo_item" autocomplete="off" />
+				<input class="form-control mb-2" placeholder="Add new Todos" id="todo_item" autocomplete="off" />
 				<button class="btn btn-block btn-primary">Submit</button>
 			</div>
 		</form>
-		<div class="list-group">
+		<div class="list-group" id="todos">
 		  {% for item in data %}
 		  	<a href="#" class="list-group-item list-group-item-action">{{ item.description }}</a>
 		  {% endfor %}
 		</div>
 	</div>
+
+<script type="text/javascript">
+	document.getElementById('form').onsubmit = function (e) {
+		e.preventDefault();
+		data = {
+			method: 'POST',
+			body: JSON.stringify({'todo_item': document.getElementById('todo_item').value}),
+			headers: {'content-Type': 'application/json'}
+		}
+		
+		fetch('/todos/create', data).then(function(response){
+			console.log(response)
+			return response;
+		}).then(function(jsonResponse){
+			console.log(jsonResponse);
+			const liItem = document.createElement('a');
+			liItem.className = "list-group-item list-group-item-action";
+			liItem.innerHTML = jsonResponse['todo_item'];
+			document.getElementById('todos').appendChild(liItem);
+		}).catch(function(err){
+			console.log(err);
+			alert('something went wrong');
+		})
+	}
+</script>
 
 </body>
 </html>

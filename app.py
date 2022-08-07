@@ -36,14 +36,17 @@ def index():
 
 @app.route('/todos/create', methods=['POST'])
 def todo_create():
-    item = request.form.get('todo_item', '').strip()
+    print(request)
+    # item = request.form.get('todo_item', '').strip()
+    item = request.json.get('todo_item', '').strip()
     if not item:
         return "Empty values are not allowed"
     
     item = Todo(description=item)
     db.session.add(item)
-    db.session.commit()
-    return redirect(url_for('index'))
+    # db.session.commit()
+    # return redirect(url_for('index'))
+    return item.description
 
 
 if __name__ == '__main__':
