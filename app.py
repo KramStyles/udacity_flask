@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+import sys
+
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -36,17 +38,31 @@ def index():
 
 @app.route('/todos/create', methods=['POST'])
 def todo_create():
-    print(request)
-    # item = request.form.get('todo_item', '').strip()
-    item = request.json.get('todo_item', '').strip()
-    if not item:
-        return "Empty values are not allowed"
-    
-    item = Todo(description=item)
-    db.session.add(item)
-    # db.session.commit()
-    # return redirect(url_for('index'))
-    return item.description
+    error = False
+    msg = ''
+
+    try:
+        # item = request.form.get('todo_item', '').strip()
+        item = request.json.get('todo_item', '').strip()
+        if not item:
+            return "Empty values are not allowed"
+        
+        item = Todo(description=item)
+        db.session.add(item)
+        # db.session.commit()
+        # return redirect(url_for('index'))
+        msg = item.description
+    except Exception as err:
+        msg = str(err)
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+
+    if not error:
+        return jsonify({
+            'todo_item': msg
+        })
 
 
 if __name__ == '__main__':

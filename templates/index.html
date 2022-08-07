@@ -13,10 +13,18 @@
 				<input class="form-control mb-2" placeholder="Add new Todos" id="todo_item" autocomplete="off" />
 				<button class="btn btn-block btn-primary">Submit</button>
 			</div>
+
 		</form>
+
 		<div class="list-group" id="todos">
 		  {% for item in data %}
-		  	<a href="#" class="list-group-item list-group-item-action">{{ item.description }}</a>
+		  	<a href="javascript:;" class="list-group-item list-group-item-action">
+
+			  <span class="custom-control custom-checkbox">
+				  <input type="checkbox" class="custom-control-input" id="todo_{{loop.index}}" {% if item.completed %} checked {% endif %}>
+				  <label class="custom-control-label" for="todo_{{loop.index}}">{{ item.description }}</label>
+			  </span>
+			</a>
 		  {% endfor %}
 		</div>
 	</div>
@@ -32,9 +40,9 @@
 		
 		fetch('/todos/create', data).then(function(response){
 			console.log(response)
-			return response;
+			return response.json();
 		}).then(function(jsonResponse){
-			console.log(jsonResponse);
+			console.log(jsonResponse, 'response');
 			const liItem = document.createElement('a');
 			liItem.className = "list-group-item list-group-item-action";
 			liItem.innerHTML = jsonResponse['todo_item'];
