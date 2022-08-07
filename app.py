@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -31,8 +31,19 @@ class Todo(db.Model):
 
 @app.route('/')
 def index():
-    data = ['Wash clothes', 'Eat food', 'Play games', 'Finish project']
+    data = Todo.query.all()
     return render_template('index.html', data=data)
+
+@app.route('/todos/create', methods=['POST'])
+def todo_create():
+    item = request.form.get('todo_item', '').strip()
+    if not item:
+        return "Empty values are not allowed"
+    
+    item = Todo(description=item)
+    db.session.add(item)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
