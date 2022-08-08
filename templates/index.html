@@ -51,7 +51,18 @@
         const button = buttons[i];
         button.onclick = function (e) {
             const data_id = e.target.attributes['data-id'].value;
-            alert(data_id)
+            if (confirm('Are you sure you want to delete?')){
+                $.ajax({
+                    url: `/todos/delete/${data_id}`,
+                    method: 'POST',
+                    success: function (data) {
+                        if (data !== 'ok') alert(`Something wrong! ${data}`)
+                        else location.reload()
+                    }, error: function (err) {
+                        console.log('Error Message', err);
+                    }
+                })
+            }
         }
     }
     for (let i = 0; i < checkboxes.length; i++) {

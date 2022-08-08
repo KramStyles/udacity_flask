@@ -84,5 +84,24 @@ def todo_update(data_id):
     return msg
 
 
+@app.route('/todos/delete/<data_id>', methods=['POST'])
+def todo_delete(data_id):
+    msg = ''
+
+    try:
+        todo = Todo.query.get(data_id)
+        db.session.delete(todo)
+        db.session.commit()
+
+        msg = 'ok'
+    except Exception as err:
+        db.session.rollback()
+        msg = str(err)
+    finally:
+        db.session.close()
+
+    return msg
+
+
 if __name__ == '__main__':
     app.run(debug=True)
