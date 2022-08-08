@@ -1,54 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<title>Homepage : Todo App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Homepage : Todo App</title>
+    <style>
+        .small-btn {
+            border-radius: 5px;
+            border: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            z-index: 2;
+        }
+    </style>
 </head>
 <body>
-	<div class="container">
-		<form class="mt-4" id='form'>
-			<div class="form-group">
-				<input class="form-control mb-2" placeholder="Add new Todos" id="todo_item" autocomplete="off" />
-				<button class="btn btn-block btn-primary">Submit</button>
-			</div>
+<div class="container">
+    <form class="mt-4" id='form'>
+        <div class="form-group">
+            <input class="form-control mb-2" placeholder="Add new Todos" id="todo_item" autocomplete="off"/>
+            <button class="btn btn-block btn-primary">Submit</button>
+        </div>
 
-		</form>
+    </form>
 
-		<div class="list-group" id="todos">
-		  {% for item in data %}
-		  	<a href="javascript:;" class="list-group-item list-group-item-action">
+    <div class="list-group" id="todos">
+        {% for item in data %}
+            <a href="javascript:;" class="list-group-item list-group-item-action">
 
 			  <span class="custom-control custom-checkbox">
-				  <input type="checkbox" class="custom-control-input" data-id="{{item.id}}" id="todo_{{loop.index}}" {% if item.completed %} checked {% endif %}>
-				  <label class="custom-control-label" for="todo_{{loop.index}}">{{ item.description }}</label>
+				  <input type="checkbox" class="custom-control-input" data-id="{{ item.id }}" id="todo_{{ loop.index }}" {% if item.completed %} checked {% endif %}>
+				  <label class="custom-control-label" for="todo_{{ loop.index }}">{{ item.description }}</label>
 			  </span>
-			</a>
-		  {% endfor %}
-		</div>
-	</div>
+            <button class="small-btn" data-id="{{ item.id }}">x</button>
+
+            </a>
+        {% endfor %}
+    </div>
+</div>
 
 <script type="text/javascript">
-	const checkboxes = document.querySelectorAll('.custom-control-input');
-	for(let i = 0; i < checkboxes.length; i++){
-		const checkbox = checkboxes[i];
-		checkbox.onchange = function(e){
-		    
-			const completed_state = e.target.checked;
-		    const data_id = e.target.attributes['data-id'].value;
+    const checkboxes = document.querySelectorAll('.custom-control-input');
+    const buttons = document.querySelectorAll('.small-btn');
+
+    for (let i = 0; i < buttons.length; i++) {
+        const button = buttons[i];
+        button.onclick = function (e) {
+            const data_id = e.target.attributes['data-id'].value;
+            alert(data_id)
+        }
+    }
+    for (let i = 0; i < checkboxes.length; i++) {
+        const checkbox = checkboxes[i];
+        checkbox.onchange = function (e) {
+
+            const completed_state = e.target.checked;
+            const data_id = e.target.attributes['data-id'].value;
             $.ajax({
                 url: `/todos/update/${data_id}`,
                 method: 'POST',
-                data: {current_state:completed_state},
-                success: function (data){
+                data: {current_state: completed_state},
+                success: function (data) {
                     if (data !== 'ok') alert(`Something wrong! ${data}`)
-                },error: function (err) {
+                }, error: function (err) {
                     console.log('Error Message', err);
                 }
             })
-		}
-	}
+        }
+    }
 
 </script>
 
