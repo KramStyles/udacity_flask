@@ -41,7 +41,12 @@ class TodoList(db.Model):
 
 @app.route('/')
 def index():
-    data = Todo.query.order_by('id').all()
+    return redirect(url_for('get_list_todos', list_id=1))
+
+
+@app.route('/lists/<list_id>')
+def get_list_todos(list_id):
+    data = Todo.query.filter_by(list_id=list_id).order_by('id').all()
     return render_template('index.html', data=data)
 
 
